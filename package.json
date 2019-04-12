@@ -1,0 +1,20 @@
+{
+	"name": "topup-systems-api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"engines": {
+		"node": ""
+	},
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"express": "^4.16.4",
+		"mongodb": "^3.2.3"
+	},
+	"scripts": {
+		"start": "npx nodemon --watch src/ src/app.js"
+	},
+	"devDependencies": {
+		"eslint-config-google": "^0.12.0"
+	}
+}
