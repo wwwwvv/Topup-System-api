@@ -7,6 +7,7 @@ const di = require('./utils/di');
 const app = express();
 
 const customers = require('./controller/customers');
+const statements = require('./controller/statements');
 
 mongoClient
 	.connect(config.mongouri, { useNewUrlParser: true })
@@ -31,6 +32,7 @@ mongoClient
 		});
 
 		app.use('/api/v1/customers', customers);
+		app.use('/api/v1/statements', statements);
 
 		console.log(`Api start at ${config.port}`);
 		app.listen(config.port);
