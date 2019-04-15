@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoClient = require('mongodb').MongoClient;
+const cors = require('cors');
 const config = require('./config');
 const di = require('./utils/di');
 const app = express();
@@ -12,7 +13,11 @@ mongoClient
 	.then(client => {
 		di.set('mongodb', client.db(config.dbName));
 		app.use(bodyParser.json());
-
+		app.use(
+			cors({
+				origin: '*',
+			}),
+		);
 		app.use((req, res, next) => {
 			if (req.body.data || req.query) {
 				next();

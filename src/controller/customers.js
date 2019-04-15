@@ -6,6 +6,7 @@ function CustomerFormat(data) {
 	return {
 		gameId: data.gameId,
 		fullname: data.fullname,
+		telno: data.telno,
 		email: data.email || '',
 		bank_info: {
 			bank_account_name: data.bank_account_name || '',
@@ -16,15 +17,17 @@ function CustomerFormat(data) {
 }
 
 async function getCustomers(req, res) {
-	const { limit, page, filter } = req.query;
+	const { limit, page, filter, options, orderby } = req.query;
+	console.log('[GET] /api/v1/customer ', JSON.stringify(req.query));
 	try {
 		const size = limit ? parseInt(limit, 10) : 10;
 		const pageNum = page ? parseInt(page, 10) : 1;
-		let search = filter ? JSON.parse(filter) : {};
-
-		const customers = await CustomerModel.getByFilter(search)
+		const search = filter ? JSON.parse(filter) : {};
+		const sort = orderby ? JSON.parse(orderby) : { created_at: -1 };
+		const customers = await CustomerModel.getByFilter(search, options)
 			.limit(size)
 			.skip(size * (pageNum - 1))
+			.sort(sort)
 			.toArray();
 
 		res.json({
@@ -45,11 +48,14 @@ async function createCustomer(req, res) {
 		gameId,
 		fullname,
 		email,
+		telno,
 		bank_account_name,
 		bank_name,
 		bank_no,
 	} = data;
-	if (!gameId && !fullname) {
+	console.log('[POST] /api/v1/customer ', JSON.stringify(req.body));
+
+	if (!gameId && !fullname && !telno) {
 		res.status(400).send('400 bad request');
 	} else {
 		try {
@@ -60,6 +66,7 @@ async function createCustomer(req, res) {
 						gameId,
 						fullname,
 						email,
+						telno,
 						bank_account_name,
 						bank_name,
 						bank_no,
@@ -67,7 +74,7 @@ async function createCustomer(req, res) {
 				);
 				res.json({
 					data: {
-						message: result.ok,
+						message: result,
 						result: true,
 					},
 				});
@@ -86,14 +93,15 @@ async function createCustomer(req, res) {
 	}
 }
 
-async function updateCustomerbyGameId(req, res) {
+async function updateCustomerbyId(req, res) {
 	const { data } = req.body;
-	const { gameId, update } = data;
-	if (!gameId) {
+	const { _id, update } = data;
+	console.log('[PUT] /api/v1/customers ', JSON.stringify(req.body));
+	if (!_id) {
 		res.status(400).send('400 bad request');
 	} else {
 		try {
-			const result = await CustomerModel.updateData({ gameId }, update);
+			const result = await CustomerModel.updateData({ _id }, update);
 			res.json({
 				data: {
 					result: result.modifiedCount,
@@ -101,19 +109,21 @@ async function updateCustomerbyGameId(req, res) {
 				},
 			});
 		} catch (error) {
+			console.log(error);
 			res.status(500).send('Internal Server Error');
 		}
 	}
 }
 
-async function deleteUserByGameId(req, res) {
-	const { data } = req.body;
-	const { gameId } = data;
-	if (!gameId) {
+async function deleteUserById(req, res) {
+	const { id } = req.query;
+	console.log('[DELETE] /api/v1/customers ', JSON.stringify(req.query));
+
+	if (!id) {
 		res.status(400).send('400 bad request');
 	} else {
 		try {
-			const result = await CustomerModel.delete({ gameId });
+			const result = await CustomerModel.delete({ _id: id });
 			res.json({
 				data: {
 					result: result.modifiedCount,
@@ -129,7 +139,7 @@ async function deleteUserByGameId(req, res) {
 
 router.get('/', getCustomers);
 router.post('/', createCustomer);
-router.put('/', updateCustomerbyGameId);
-router.delete('/', deleteUserByGameId);
+router.put('/', updateCustomerbyId);
+router.delete('/', deleteUserById);
 
 module.exports = router;
