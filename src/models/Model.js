@@ -10,7 +10,13 @@ class Model {
 		const db = di.get('mongodb');
 		let filtered = filter;
 		if (options === 'like') {
-			const values = Object.values(filtered).map(value => RegExp(value));
+			const values = Object.values(filtered).map(value => {
+				if (typeof value === 'string') {
+					return RegExp(value);
+				} else {
+					return value;
+				}
+			});
 			Object.keys(filtered).forEach((key, index) => {
 				filtered[key] = values[index];
 			});

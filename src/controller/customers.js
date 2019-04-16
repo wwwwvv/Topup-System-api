@@ -3,6 +3,7 @@ const router = express.Router();
 const CustomerModel = require('../models/Customers');
 
 function CustomerFormat(data) {
+	console.log(data);
 	return {
 		gameId: data.gameId,
 		fullname: data.fullname,
@@ -10,8 +11,8 @@ function CustomerFormat(data) {
 		email: data.email || '',
 		bank_info: {
 			bank_account_name: data.bank_account_name || '',
-			bank_name: data.bank_name || '',
-			bank_no: data.bank_id || '',
+			bank: data.bank || '',
+			bank_account_id: data.bank_account_id || '',
 		},
 	};
 }
@@ -50,8 +51,8 @@ async function createCustomer(req, res) {
 		email,
 		telno,
 		bank_account_name,
-		bank_name,
-		bank_no,
+		bank,
+		bank_account_id,
 	} = data;
 	console.log('[POST] /api/v1/customer ', JSON.stringify(req.body));
 
@@ -68,8 +69,8 @@ async function createCustomer(req, res) {
 						email,
 						telno,
 						bank_account_name,
-						bank_name,
-						bank_no,
+						bank,
+						bank_account_id,
 					}),
 				);
 				res.json({

@@ -35,12 +35,11 @@ async function addStatementbyCustomerId(req, res) {
 }
 
 async function getStatement(req, res) {
-	const { id, page, limit, filter, orderby } = req.query;
+	const { id, page, limit, filter, orderby, options } = req.query;
 	const pageNum = page || 1;
 	const size = parseInt(limit, 10) || 10;
 	let search = filter ? JSON.parse(filter) : {};
 	const sort = orderby ? JSON.parse(orderby) : { created_at: -1 };
-
 	console.log(' [GET] /api/v1/statements  ', JSON.stringify(req.query));
 	if (!id) {
 		res.status(400).send(' 400 Bad request');
@@ -48,7 +47,7 @@ async function getStatement(req, res) {
 		try {
 			search = { ...search, customer_id: ObjectId(id) };
 			const statements = await statementModel
-				.getByFilter(search)
+				.getByFilter(search, options)
 				.limit(size)
 				.skip(size * (pageNum - 1))
 				.sort(sort)
