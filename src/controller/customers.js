@@ -5,14 +5,15 @@ const CustomerModel = require('../models/Customers');
 function CustomerFormat(data) {
 	console.log(data);
 	return {
-		gameId: data.gameId,
-		fullname: data.fullname,
-		telno: data.telno,
-		email: data.email || '',
+		gameId: `${data.gameId}`,
+		fullname: `${data.fullname}`,
+		telno: `${data.telno}`,
+		email: `${data.email}` || '',
+		remark: `${data.remark}` || '',
 		bank_info: {
-			bank_account_name: data.bank_account_name || '',
-			bank: data.bank || '',
-			bank_account_id: data.bank_account_id || '',
+			bank_account_name: `${data.bank_account_name}` || '',
+			bank: `${data.bank}` || '',
+			bank_account_id: `${data.bank_account_id}` || '',
 		},
 	};
 }
@@ -53,6 +54,7 @@ async function createCustomer(req, res) {
 		bank_account_name,
 		bank,
 		bank_account_id,
+		remark,
 	} = data;
 	console.log('[POST] /api/v1/customer ', JSON.stringify(req.body));
 
@@ -71,6 +73,7 @@ async function createCustomer(req, res) {
 						bank_account_name,
 						bank,
 						bank_account_id,
+						remark,
 					}),
 				);
 				res.json({
