@@ -78,6 +78,32 @@ class Model {
 		});
 	}
 
+	updateDataWithOutUpsert(filter, data) {
+		const db = di.get('mongodb');
+		delete data.updated_at;
+		let useFilter = filter;
+		if (useFilter._id) {
+			useFilter = {
+				...useFilter,
+				_id: ObjectId(useFilter._id),
+			};
+		}
+		const updateData = {
+			$set: {
+				...data,
+			},
+			$currentDate: {
+				updated_at: { $type: 'date' },
+			},
+		};
+		useFilter = {
+			...useFilter,
+			deleted_at: { $exists: false },
+		};
+
+		return db.collection(this.collection).updateOne(useFilter, updateData);
+	}
+
 	delete(filter) {
 		let updateFilter = filter;
 		if (updateFilter._id) {

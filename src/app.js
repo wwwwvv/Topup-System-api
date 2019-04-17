@@ -2,12 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoClient = require('mongodb').MongoClient;
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const config = require('./config');
 const di = require('./utils/di');
 const app = express();
 
 const customers = require('./controller/customers');
 const statements = require('./controller/statements');
+const { router: users, verifyToken } = require('./controller/users');
 
 mongoClient
 	.connect(config.mongouri, { useNewUrlParser: true })
@@ -19,20 +21,13 @@ mongoClient
 				origin: '*',
 			}),
 		);
-		app.use((req, res, next) => {
-			if (req.body.data || req.query) {
-				next();
-			} else {
-				res.status(400).send('bad request');
-			}
-		});
-
 		app.get('/healthcheck', (req, res) => {
 			res.send('ok');
 		});
-
+		app.use(verifyToken);
 		app.use('/api/v1/customers', customers);
 		app.use('/api/v1/statements', statements);
+		app.use('/api/v1/users', users);
 
 		console.log(`Api start at ${config.port}`);
 		app.listen(config.port);

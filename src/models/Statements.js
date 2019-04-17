@@ -16,21 +16,23 @@ class Statements extends Model {
 			let promotion_total = 0;
 
 			statements.forEach(statement => {
-				switch (statement.type) {
-					case 'deposit':
-						total += parseFloat(statement.value);
-						break;
-					case 'withdraw':
-						total -= parseFloat(statement.value);
-						break;
+				if (statement.status === 'approve') {
+					switch (statement.type) {
+						case 'deposit':
+							total += parseFloat(statement.value);
+							break;
+						case 'withdraw':
+							total -= parseFloat(statement.value);
+							break;
 
-					case 'deposit_promo':
-						promotion_total += parseFloat(statement.value);
-						break;
+						case 'deposit_promo':
+							promotion_total += parseFloat(statement.value);
+							break;
 
-					case 'withdraw_promo':
-						promotion_total -= parseFloat(statement.value);
-						break;
+						case 'withdraw_promo':
+							promotion_total -= parseFloat(statement.value);
+							break;
+					}
 				}
 			});
 			return {
@@ -61,6 +63,7 @@ class Statements extends Model {
 					console.log('Add statement');
 					await this.create({
 						customer_id: ObjectId(customer_id),
+						status: 'waiting',
 						...statementObj,
 					});
 					return true;
@@ -75,6 +78,7 @@ class Statements extends Model {
 					console.log('Add statement');
 					await this.create({
 						customer_id: ObjectId(customer_id),
+						status: 'waiting',
 						...statementObj,
 					});
 					return true;
@@ -84,9 +88,51 @@ class Statements extends Model {
 				console.log('Add statement');
 				await this.create({
 					customer_id: ObjectId(customer_id),
+					status: 'waiting',
 					...statementObj,
 				});
 				return true;
+			}
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	async cancelStatement(staff_id, statement_id) {
+		try {
+			const filter = { _id: ObjectId(statement_id) };
+			const { modifiedCount } = await this.updateDataWithOutUpsert(filter, {
+				status: 'not approve',
+				cancelby: staff_id,
+			});
+			if (modifiedCount > 0) {
+				console.log('Cancel Statement ', statement_id);
+				return true;
+			} else {
+				console.log('Cant Cancel Statement ', statement_id);
+				return false;
+			}
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	async approveStatement(staff_id, statement_id) {
+		try {
+			const filter = {
+				_id: ObjectId(statement_id),
+				status: { $ne: 'not approve' },
+			};
+			const { modifiedCount } = await this.updateDataWithOutUpsert(filter, {
+				status: 'approve',
+				approveby: staff_id,
+			});
+			if (modifiedCount > 0) {
+				console.log('Approve Statement ', statement_id);
+				return true;
+			} else {
+				console.log('Cant Approve Statement ', statement_id);
+				return false;
 			}
 		} catch (err) {
 			throw err;

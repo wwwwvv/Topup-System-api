@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const statementModel = require('../models/Statements');
+const logModel = require('../models/Logs');
 const ObjectId = require('mongodb').ObjectId;
 
 async function addStatementbyCustomerId(req, res) {
@@ -20,6 +21,12 @@ async function addStatementbyCustomerId(req, res) {
 				total,
 				promotion_total,
 			} = await statementModel.getAllTotalBalance(customer_id);
+			await logModel.createLog('statement', {
+				customer_id,
+				type,
+				user_id: staffId,
+				message: `User ${staffId} do ${type} with ${customer_id} value ${value} remark: ${description} `,
+			});
 			res.json({
 				data: {
 					status,
@@ -30,6 +37,80 @@ async function addStatementbyCustomerId(req, res) {
 		} catch (error) {
 			console.log(error);
 			res.status(500).send('Internal Server Error');
+		}
+	}
+}
+
+async function cancelStatementById(req, res) {
+	const { data } = req.body;
+	const { staffId, statement_id, remark } = data;
+
+	console.log('[DELETE] api/v1/statements ', data);
+
+	if (!statement_id || !staffId || !remark) {
+		res.status(400).send(' 400 Bad request');
+	} else {
+		const result = await statementModel.cancelStatement(staffId, statement_id);
+		await logModel.createLog('statement', {
+			customer_id: '',
+			type: 'cancel',
+			user_id: staffId,
+			message: `User ${staffId} do cancel statement ${statement_id}  remark: ${remark} `,
+		});
+		if (result) {
+			res.json({
+				data: {
+					status: true,
+				},
+			});
+		} else {
+			res.json({
+				data: {
+					message: 'Cant cancel statement',
+					status: false,
+				},
+			});
+		}
+	}
+}
+
+async function approveStatement(req, res) {
+	const { data } = req.body;
+	const { staffId, statement_id, remark } = data;
+	console.log('[PUT] api/v1/statements ', data);
+	if (!statement_id || !staffId || !remark) {
+		res.status(400).send(' 400 Bad request');
+	} else {
+		try {
+			const result = await statementModel.approveStatement(
+				staffId,
+				statement_id,
+			);
+
+			await logModel.createLog('statement', {
+				customer_id: '',
+				type: 'approve',
+				user_id: staffId,
+				message: `User ${staffId} aprrove statement ${statement_id}  remark: ${remark} `,
+			});
+
+			if (result) {
+				res.json({
+					data: {
+						status: true,
+					},
+				});
+			} else {
+				res.json({
+					data: {
+						message: 'Cant cancel statement',
+						status: false,
+					},
+				});
+			}
+		} catch (err) {
+			console.log(err.stack);
+			res.status(500).end();
 		}
 	}
 }
@@ -71,6 +152,8 @@ async function getStatement(req, res) {
 	}
 }
 
+router.put('/', approveStatement);
+router.delete('/', cancelStatementById);
 router.post('/', addStatementbyCustomerId);
 router.get('/', getStatement);
 
