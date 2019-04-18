@@ -16,7 +16,8 @@
 		"mongodb": "^3.2.3"
 	},
 	"scripts": {
-		"start": "npx nodemon --watch src/ src/app.js"
+		"start": "npx nodemon --watch src/ src/app.js",
+		"production": "pm2-runtime src/app.js"
 	},
 	"devDependencies": {
 		"eslint-config-google": "^0.12.0"

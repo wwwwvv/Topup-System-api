@@ -43,9 +43,9 @@ async function addStatementbyCustomerId(req, res) {
 
 async function cancelStatementById(req, res) {
 	const { data } = req.body;
-	const { staffId, statement_id, remark } = data;
+	console.log('[PUT] api/v1/statements/delete ', data);
 
-	console.log('[DELETE] api/v1/statements ', data);
+	const { staffId, statement_id, remark } = data;
 
 	if (!statement_id || !staffId || !remark) {
 		res.status(400).send(' 400 Bad request');
@@ -187,7 +187,7 @@ async function getReport(req, res) {
 }
 
 router.put('/', approveStatement);
-router.delete('/', cancelStatementById);
+router.put('/delete', cancelStatementById);
 router.post('/', addStatementbyCustomerId);
 router.get('/', getStatement);
 router.get('/report', getReport);
