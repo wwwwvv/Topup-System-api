@@ -122,47 +122,65 @@ async function getStatement(req, res) {
 	let search = filter ? JSON.parse(filter) : {};
 	const sort = orderby ? JSON.parse(orderby) : { created_at: -1 };
 	console.log(' [GET] /api/v1/statements  ', JSON.stringify(req.query));
-	if (!id) {
-		res.status(400).send(' 400 Bad request');
-	} else {
-		try {
+	try {
+		let result = {};
+
+		if (id) {
+			console.log('GET STATEMENT from Customer ID ', id);
 			search = { ...search, customer_id: ObjectId(id) };
-			const statements = await statementModel
-				.getByFilter(search, options)
-				.limit(size)
-				.skip(size * (pageNum - 1))
-				.sort(sort)
-				.toArray();
 			const {
 				total,
 				promotion_total,
 			} = await statementModel.getAllTotalBalance(id);
-			res.json({
+			result = {
 				data: {
-					statements,
 					total,
 					promotion_total,
-					count: statements.length,
 				},
-			});
-		} catch (err) {
-			console.log(err);
-			res.status(500).send('Internal Server Error');
+			};
+		} else {
+			console.log('GET STATEMENT LIST');
+			search = { ...search };
 		}
+
+		const statements = await statementModel
+			.getByFilter(search, options)
+			.limit(size)
+			.skip(size * (pageNum - 1))
+			.sort(sort)
+			.toArray();
+
+		result = {
+			data: {
+				...result.data,
+				statements,
+				count: statements.length,
+			},
+		};
+
+		console.log(result);
+		res.json(result);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Internal Server Error');
 	}
+	// }
 }
 
 async function getReport(req, res) {
-	const { month, year, mode } = req.query;
+	const { month, year, mode, type } = req.query;
 	console.log(' [GET] /api/v1/statements/report  ', JSON.stringify(req.query));
 
 	try {
-		const result = await statementModel.getReport(month, year, mode);
-		res.json({
-			data: {
-				report: result,
-			},
-		});
+		if (type === 'balance') {
+		} else {
+			const result = await statementModel.getReport(month, year, mode);
+			res.json({
+				data: {
+					report: result,
+				},
+			});
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).end();

@@ -77,6 +77,8 @@ async function login(req, res) {
 						token,
 						role: userInfo.role,
 						status: true,
+						staffid: userInfo._id,
+						username: userInfo.username,
 					},
 				});
 			} else {
@@ -100,7 +102,7 @@ async function verifyToken(req, res, next) {
 	} else {
 		try {
 			const token = req.headers.authorization.split(' ');
-			const { username, role } = await jwt.verify(token[1], secret);
+			const { role } = await jwt.verify(token[1], secret);
 			if (role === 99) {
 				next();
 			} else {

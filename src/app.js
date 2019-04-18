@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoClient = require('mongodb').MongoClient;
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const config = require('./config');
 const di = require('./utils/di');
 const app = express();

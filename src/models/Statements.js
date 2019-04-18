@@ -24,13 +24,13 @@ class Statements extends Model {
 						case 'withdraw':
 							total -= parseFloat(statement.value);
 							break;
-
 						case 'deposit_promo':
 							promotion_total += parseFloat(statement.value);
 							break;
-
 						case 'withdraw_promo':
 							promotion_total -= parseFloat(statement.value);
+							break;
+						default:
 							break;
 					}
 				}
