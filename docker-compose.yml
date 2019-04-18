@@ -1,0 +1,29 @@
+version: '3'
+services:
+  database:
+    build: ./docker/mongodb
+    container_name: 'mongodb'
+    logging:
+      driver: 'json-file'
+    networks:
+      api:
+    ports:
+      - '27017:27017'
+  server:
+    build: ./docker/node
+    container_name: 'topup-api'
+    environment:
+      - 'mongouri=mongodb://database:27017'
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: >
+      sh -c "yarn && yarn start"
+    logging:
+      driver: 'json-file'
+    networks:
+      api:
+    ports:
+      - '2019:2019'
+networks:
+  api:
