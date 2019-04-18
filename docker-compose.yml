@@ -3,6 +3,8 @@ services:
   database:
     build: ./docker/mongodb
     container_name: 'mongodb'
+    volumes:
+      - ./db:/data/db
     logging:
       driver: 'json-file'
     networks:
