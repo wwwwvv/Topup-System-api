@@ -158,7 +158,6 @@ async function getStatement(req, res) {
 			},
 		};
 
-		console.log(result);
 		res.json(result);
 	} catch (err) {
 		console.log(err);
