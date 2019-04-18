@@ -124,8 +124,59 @@ async function verifyToken(req, res, next) {
 	}
 }
 
+async function getUsers(req, res) {
+	const { limit, page, filter, options, orderby } = req.query;
+	console.log('[GET] /api/v1/users ', JSON.stringify(req.query));
+	try {
+		const size = limit ? parseInt(limit, 10) : 10;
+		const pageNum = page ? parseInt(page, 10) : 1;
+		const search = filter ? JSON.parse(filter) : {};
+		const sort = orderby ? JSON.parse(orderby) : { created_at: -1 };
+		const users = await userModel
+			.getByFilter(search, options)
+			.limit(size)
+			.skip(size * (pageNum - 1))
+			.sort(sort)
+			.toArray();
+		res.json({
+			data: {
+				users,
+				count: users.length,
+			},
+		});
+	} catch (error) {
+		console.error(error.stack);
+		res.status(500).send('Internal server error');
+	}
+}
+
+async function updateUser(req, res) {
+	const { data } = req.body;
+	const { _id, update } = data;
+	delete update.password;
+	console.log('[PUT] /api/v1/users ', JSON.stringify(req.body));
+	if (!_id) {
+		res.status(400).send('400 bad request');
+	} else {
+		try {
+			const result = await userModel.updateData({ _id }, update);
+			res.json({
+				data: {
+					result: result.modifiedCount,
+					status: result.modifiedCount > 0 ? true : false,
+				},
+			});
+		} catch (error) {
+			console.log(error);
+			res.status(500).send('Internal Server Error');
+		}
+	}
+}
+
+router.get('/', getUsers);
 router.post('/login', login);
 router.post('/register', createUser);
+router.put('/', updateUser);
 
 module.exports = {
 	router,
