@@ -117,6 +117,12 @@ class Model {
 		};
 		return db.collection(this.collection).updateOne(updateFilter, updateData);
 	}
+
+	aggregate(pipline, option = {}) {
+		const db = di.get('mongodb');
+
+		return db.collection(this.collection).aggregate(pipline, option);
+	}
 }
 
 module.exports = Model;

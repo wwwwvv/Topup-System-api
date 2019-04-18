@@ -66,7 +66,6 @@ async function login(req, res) {
 						role: userInfo.role,
 					},
 					secret,
-					{ expiresIn: '1h' },
 				);
 
 				await logsModel.createLog('users', {
@@ -76,6 +75,7 @@ async function login(req, res) {
 				res.json({
 					data: {
 						token,
+						role: userInfo.role,
 						status: true,
 					},
 				});
@@ -101,9 +101,6 @@ async function verifyToken(req, res, next) {
 		try {
 			const token = req.headers.authorization.split(' ');
 			const { username, role } = await jwt.verify(token[1], secret);
-			await logsModel.createLog('custom', {
-				message: `User : ${username} role: ${role} Route: ${req.path}`,
-			});
 			if (role === 99) {
 				next();
 			} else {
@@ -119,6 +116,7 @@ async function verifyToken(req, res, next) {
 				}
 			}
 		} catch (error) {
+			console.log(error);
 			res.status(400).send('Token incorrect');
 		}
 	}

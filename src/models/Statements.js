@@ -138,6 +138,156 @@ class Statements extends Model {
 			throw err;
 		}
 	}
+
+	async getReport(month, year, mode) {
+		try {
+			let pipline = [];
+			if (mode === 'month') {
+				pipline = [
+					{
+						$match: {
+							created_at: {
+								$gte: new Date(`${month}/1/${year}`),
+								$lt: new Date(`${month}/30/${year}`),
+							},
+							status: 'approve',
+						},
+					},
+					{
+						$group: {
+							_id: {
+								day: {
+									$dayOfMonth: '$created_at',
+								},
+							},
+							withdraw: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdraw'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							deposit: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'deposit'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							withdrawPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdrawPromotion'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							depositPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'depositPromotion'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+						},
+					},
+					{
+						$sort: {
+							'_id.day': 1,
+						},
+					},
+				];
+			} else {
+				pipline = [
+					{
+						$match: {
+							created_at: {
+								$gte: new Date(`1/1/${year}`),
+								$lt: new Date(`12/31/${year}`),
+							},
+							status: 'approve',
+						},
+					},
+					{
+						$group: {
+							_id: {
+								month: {
+									$month: '$created_at',
+								},
+							},
+							withdraw: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdraw'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							deposit: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'deposit'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							withdrawPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdrawPromotion'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+							depositPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'depositPromotion'],
+										},
+										1,
+										0,
+									],
+								},
+							},
+						},
+					},
+					{
+						$sort: {
+							'_id.month': 1,
+						},
+					},
+				];
+			}
+			return await this.aggregate(pipline).toArray();
+		} catch (err) {
+			throw err;
+		}
+	}
 }
 
 module.exports = new Statements();

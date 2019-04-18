@@ -152,9 +152,27 @@ async function getStatement(req, res) {
 	}
 }
 
+async function getReport(req, res) {
+	const { month, year, mode } = req.query;
+	console.log(' [GET] /api/v1/statements/report  ', JSON.stringify(req.query));
+
+	try {
+		const result = await statementModel.getReport(month, year, mode);
+		res.json({
+			data: {
+				report: result,
+			},
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).end();
+	}
+}
+
 router.put('/', approveStatement);
 router.delete('/', cancelStatementById);
 router.post('/', addStatementbyCustomerId);
 router.get('/', getStatement);
+router.get('/report', getReport);
 
 module.exports = router;
