@@ -1,2 +1,3 @@
 FROM node:11.14.0-alpine
 RUN npm install -g yarn
+RUN mpm install -g pm2
