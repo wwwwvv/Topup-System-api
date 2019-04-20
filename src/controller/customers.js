@@ -3,7 +3,6 @@ const router = express.Router();
 const CustomerModel = require('../models/Customers');
 
 function CustomerFormat(data) {
-	console.log(data);
 	return {
 		gameId: `${data.gameId}`,
 		fullname: `${data.fullname}`,
