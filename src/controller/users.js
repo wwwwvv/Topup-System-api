@@ -153,13 +153,23 @@ async function getUsers(req, res) {
 async function updateUser(req, res) {
 	const { data } = req.body;
 	const { _id, update } = data;
-	delete update.password;
-	console.log('[PUT] /api/v1/users ', JSON.stringify(req.body));
+	console.log('[PUT] /api/v1/users ', JSON.stringify(data));
+	let updateUserData = update;
+	delete updateUserData._id;
+	if (updateUserData.password) {
+		updateUserData.password = await bcrypt.hash(
+			updateUserData.password,
+			saltround,
+		);
+	}
 	if (!_id) {
 		res.status(400).send('400 bad request');
 	} else {
 		try {
-			const result = await userModel.updateData({ _id }, update);
+			const result = await userModel.updateDataWithOutUpsert(
+				{ _id },
+				updateUserData,
+			);
 			res.json({
 				data: {
 					result: result.modifiedCount,
