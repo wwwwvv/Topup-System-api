@@ -183,10 +183,33 @@ async function updateUser(req, res) {
 	}
 }
 
+async function deleteUserById(req, res) {
+	const { id } = req.query;
+	console.log('[DELETE] /api/v1/users ', JSON.stringify(req.query));
+
+	if (!id) {
+		res.status(400).send('400 bad request');
+	} else {
+		try {
+			const result = await userModel.delete({ _id: id });
+			res.json({
+				data: {
+					result: result.modifiedCount,
+					status: result.modifiedCount > 0 ? true : false,
+				},
+			});
+		} catch (err) {
+			console.error(err);
+			res.status(500).send('Internal server Error');
+		}
+	}
+}
+
 router.get('/', getUsers);
 router.post('/login', login);
 router.post('/register', createUser);
 router.put('/', updateUser);
+router.delete('/', deleteUserById);
 
 module.exports = {
 	router,
