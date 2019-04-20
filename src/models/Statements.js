@@ -8,7 +8,10 @@ class Statements extends Model {
 
 	async getAllTotalBalance(customer_id) {
 		try {
-			const filter = { customer_id: ObjectId(customer_id) };
+			let filter = {};
+			if (customer_id) {
+				filter = { customer_id: ObjectId(customer_id) };
+			}
 			const statements = await this.getByFilter(filter)
 				.sort('created_at', 1)
 				.toArray();
@@ -139,7 +142,7 @@ class Statements extends Model {
 		}
 	}
 
-	async getReport(month, year, mode) {
+	async getReportStatement(month, year, mode) {
 		try {
 			let pipline = [];
 			if (mode === 'month') {
@@ -270,6 +273,156 @@ class Statements extends Model {
 											$eq: ['$type', 'depositPromotion'],
 										},
 										1,
+										0,
+									],
+								},
+							},
+						},
+					},
+					{
+						$sort: {
+							'_id.month': 1,
+						},
+					},
+				];
+			}
+			return await this.aggregate(pipline).toArray();
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	async getReportStatementBalance(month, year, mode) {
+		try {
+			let pipline = [];
+			if (mode === 'month') {
+				pipline = [
+					{
+						$match: {
+							created_at: {
+								$gte: new Date(`${month}/1/${year}`),
+								$lt: new Date(`${month}/30/${year}`),
+							},
+							status: 'approve',
+						},
+					},
+					{
+						$group: {
+							_id: {
+								day: {
+									$dayOfMonth: '$created_at',
+								},
+							},
+							withdraw: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdraw'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							deposit: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'deposit'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							withdrawPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdrawPromotion'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							depositPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'depositPromotion'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+						},
+					},
+					{
+						$sort: {
+							'_id.day': 1,
+						},
+					},
+				];
+			} else {
+				pipline = [
+					{
+						$match: {
+							created_at: {
+								$gte: new Date(`1/1/${year}`),
+								$lt: new Date(`12/31/${year}`),
+							},
+							status: 'approve',
+						},
+					},
+					{
+						$group: {
+							_id: {
+								month: {
+									$month: '$created_at',
+								},
+							},
+							withdraw: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdraw'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							deposit: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'deposit'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							withdrawPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'withdrawPromotion'],
+										},
+										'$value',
+										0,
+									],
+								},
+							},
+							depositPromotion: {
+								$sum: {
+									$cond: [
+										{
+											$eq: ['$type', 'depositPromotion'],
+										},
+										'$value',
 										0,
 									],
 								},

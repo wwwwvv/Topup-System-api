@@ -166,20 +166,38 @@ async function getStatement(req, res) {
 	// }
 }
 
-async function getReport(req, res) {
+async function getReportStatement(req, res) {
 	const { month, year, mode, type } = req.query;
 	console.log(' [GET] /api/v1/statements/report  ', JSON.stringify(req.query));
-
 	try {
+		let result = {};
+		let report = [];
 		if (type === 'balance') {
-		} else {
-			const result = await statementModel.getReport(month, year, mode);
-			res.json({
+			report = await statementModel.getReportStatementBalance(
+				month,
+				year,
+				mode,
+			);
+			const {
+				total,
+				promotion_total,
+			} = await statementModel.getAllTotalBalance();
+			result = {
 				data: {
-					report: result,
+					report,
+					total,
+					promotion_total,
 				},
-			});
+			};
+		} else {
+			report = await statementModel.getReportStatement(month, year, mode);
+			result = {
+				data: {
+					report,
+				},
+			};
 		}
+		res.json(result);
 	} catch (err) {
 		console.log(err);
 		res.status(500).end();
@@ -190,6 +208,6 @@ router.put('/', approveStatement);
 router.put('/delete', cancelStatementById);
 router.post('/', addStatementbyCustomerId);
 router.get('/', getStatement);
-router.get('/report', getReport);
+router.get('/report', getReportStatement);
 
 module.exports = router;
