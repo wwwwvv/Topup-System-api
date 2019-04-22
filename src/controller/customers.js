@@ -15,6 +15,10 @@ function CustomerFormat(data) {
 			bank: `${data.bank}` || '',
 			bank_account_id: `${data.bank_account_id}` || '',
 		},
+		referent: {
+			type: `${data.referent.type}` || '',
+			value: `${data.referent.value}` || '',
+		}
 	};
 }
 
@@ -70,6 +74,7 @@ async function createCustomer(req, res) {
 		bank,
 		bank_account_id,
 		remark,
+		referent
 	} = data;
 	console.log('[POST] /api/v1/customer ', JSON.stringify(req.body));
 
@@ -89,6 +94,7 @@ async function createCustomer(req, res) {
 						bank,
 						bank_account_id,
 						remark,
+						referent
 					}),
 				);
 				res.json({
