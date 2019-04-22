@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const statementModel = require('../models/Statements');
+const customerModel = require('../models/Customers');
 const logModel = require('../models/Logs');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -126,7 +127,7 @@ async function getStatement(req, res) {
 		let result = {};
 
 		if (id) {
-			console.log('GET STATEMENT from Customer ID ', id);
+			console.log('GET STATEMENT from Customer Object ID ', id);
 			search = { ...search, customer_id: ObjectId(id) };
 			const {
 				total,
@@ -143,13 +144,23 @@ async function getStatement(req, res) {
 			search = { ...search };
 		}
 
-		const statements = await statementModel
+		const rawStatements = await statementModel
 			.getByFilter(search, options)
 			.limit(size)
 			.skip(size * (pageNum - 1))
 			.sort(sort)
 			.toArray();
+		const promises = rawStatements.map(async statement => {
+			const [CustomerData] = await customerModel.getByFilter({ _id: statement.customer_id }).toArray();
+			
+			return {
+				...statement,
+				CustomerData
+			}
+		})
 
+		const statements = await Promise.all(promises)
+		
 		result = {
 			data: {
 				...result.data,

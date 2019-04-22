@@ -17,21 +17,29 @@ class Statements extends Model {
 				.toArray();
 			let total = 0;
 			let promotion_total = 0;
+			let depositpromo_total = 0;
+			let withdrawpromo_total = 0;
+			let withdraw_total = 0;
+			let deposit_total = 0;
 
 			statements.forEach(statement => {
 				if (statement.status === 'approve') {
 					switch (statement.type) {
 						case 'deposit':
 							total += parseFloat(statement.value);
+							deposit_total += parseFloat(statement.value);
 							break;
 						case 'withdraw':
 							total -= parseFloat(statement.value);
+							withdraw_total += parseFloat(statement.value);
 							break;
 						case 'deposit_promo':
 							promotion_total += parseFloat(statement.value);
+							depositpromo_total += parseFloat(statement.value)
 							break;
 						case 'withdraw_promo':
 							promotion_total -= parseFloat(statement.value);
+							withdraw_promo_total += parseFloat(statement.value);
 							break;
 						default:
 							break;
@@ -42,6 +50,10 @@ class Statements extends Model {
 				total,
 				promotion_total,
 				statements,
+				depositpromo_total,
+				withdrawpromo_total,
+				withdraw_total,
+				deposit_total
 			};
 		} catch (err) {
 			throw err;

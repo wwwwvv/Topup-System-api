@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const CustomerModel = require('../models/Customers');
+const StatementModel = require('../models/Statements');
 
 function CustomerFormat(data) {
 	return {
@@ -25,11 +26,26 @@ async function getCustomers(req, res) {
 		const pageNum = page ? parseInt(page, 10) : 1;
 		const search = filter ? JSON.parse(filter) : {};
 		const sort = orderby ? JSON.parse(orderby) : { created_at: -1 };
-		const customers = await CustomerModel.getByFilter(search, options)
+		const customersData = await CustomerModel.getByFilter(search, options)
 			.limit(size)
 			.skip(size * (pageNum - 1))
 			.sort(sort)
 			.toArray();
+			
+		const promises = customersData.map( async customer => {
+			const { depositpromo_total, withdrawpromo_total, withdraw_total, deposit_total, total, promotion_total } =  await StatementModel.getAllTotalBalance(customer._id)
+			return {
+				...customer,
+				deposit_total,
+				depositpromo_total,
+				withdrawpromo_total,
+				withdraw_total,
+				total,
+				promotion_total
+			}
+		})
+
+		const customers = await Promise.all(promises);
 
 		res.json({
 			data: {
