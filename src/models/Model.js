@@ -53,6 +53,8 @@ class Model {
 	updateData(filter, data) {
 		const db = di.get('mongodb');
 		delete data.updated_at;
+		delete data.created_at;
+
 		let useFilter = filter;
 		if (useFilter._id) {
 			useFilter = {
@@ -63,7 +65,6 @@ class Model {
 		const updateData = {
 			$set: {
 				...data,
-				created_at: new Date(data.created_at),
 			},
 			$currentDate: {
 				updated_at: { $type: 'date' },
@@ -82,6 +83,8 @@ class Model {
 	updateDataWithOutUpsert(filter, data) {
 		const db = di.get('mongodb');
 		delete data.updated_at;
+		delete data.created_at;
+
 		let useFilter = filter;
 		if (useFilter._id) {
 			useFilter = {
@@ -92,7 +95,6 @@ class Model {
 		const updateData = {
 			$set: {
 				...data,
-				created_at: new Date(data.created_at),
 			},
 			$currentDate: {
 				updated_at: { $type: 'date' },
