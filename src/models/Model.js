@@ -63,6 +63,7 @@ class Model {
 		const updateData = {
 			$set: {
 				...data,
+				created_at: new Date(data.created_at),
 			},
 			$currentDate: {
 				updated_at: { $type: 'date' },
@@ -91,6 +92,7 @@ class Model {
 		const updateData = {
 			$set: {
 				...data,
+				created_at: new Date(data.created_at),
 			},
 			$currentDate: {
 				updated_at: { $type: 'date' },
