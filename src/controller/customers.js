@@ -169,9 +169,28 @@ async function deleteUserById(req, res) {
 	}
 }
 
+async function getReportCustomers(req, res) {
+	const { month, year, mode } = req.query;
+	console.log(' [GET] /api/v1/Customers/report  ', JSON.stringify(req.query));
+	try {
+		const report = await CustomerModel.countCustomerbyDate(month, year, mode);
+		const result = {
+			data: {
+				report,
+			},
+		};
+
+		res.json(result);
+	} catch (err) {
+		console.log(err);
+		res.status(500).end();
+	}
+}
+
 router.get('/', getCustomers);
 router.post('/', createCustomer);
 router.put('/', updateCustomerbyId);
 router.delete('/', deleteUserById);
+router.get('/report', getReportCustomers);
 
 module.exports = router;
