@@ -35,7 +35,7 @@ class Statements extends Model {
 							break;
 						case 'deposit_promo':
 							promotion_total += parseFloat(statement.value);
-							depositpromo_total += parseFloat(statement.value)
+							depositpromo_total += parseFloat(statement.value);
 							break;
 						case 'withdraw_promo':
 							promotion_total -= parseFloat(statement.value);
@@ -53,7 +53,7 @@ class Statements extends Model {
 				depositpromo_total,
 				withdrawpromo_total,
 				withdraw_total,
-				deposit_total
+				deposit_total,
 			};
 		} catch (err) {
 			throw err;

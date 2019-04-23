@@ -151,16 +151,18 @@ async function getStatement(req, res) {
 			.sort(sort)
 			.toArray();
 		const promises = rawStatements.map(async statement => {
-			const [CustomerData] = await customerModel.getByFilter({ _id: statement.customer_id }).toArray();
-			
+			const [CustomerData] = await customerModel
+				.getByFilter({ _id: statement.customer_id })
+				.toArray();
+
 			return {
 				...statement,
-				CustomerData
-			}
-		})
+				CustomerData,
+			};
+		});
 
-		const statements = await Promise.all(promises)
-		
+		const statements = await Promise.all(promises);
+
 		result = {
 			data: {
 				...result.data,

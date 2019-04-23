@@ -15,10 +15,10 @@ function CustomerFormat(data) {
 			bank: `${data.bank}` || '',
 			bank_account_id: `${data.bank_account_id}` || '',
 		},
-		referent: {
-			type: `${data.referent.type}` || '',
-			value: `${data.referent.value}` || '',
-		}
+		reference: {
+			type: `${data.reference.type}` || '',
+			value: `${data.reference.value}` || '',
+		},
 	};
 }
 
@@ -35,9 +35,16 @@ async function getCustomers(req, res) {
 			.skip(size * (pageNum - 1))
 			.sort(sort)
 			.toArray();
-			
-		const promises = customersData.map( async customer => {
-			const { depositpromo_total, withdrawpromo_total, withdraw_total, deposit_total, total, promotion_total } =  await StatementModel.getAllTotalBalance(customer._id)
+
+		const promises = customersData.map(async customer => {
+			const {
+				depositpromo_total,
+				withdrawpromo_total,
+				withdraw_total,
+				deposit_total,
+				total,
+				promotion_total,
+			} = await StatementModel.getAllTotalBalance(customer._id);
 			return {
 				...customer,
 				deposit_total,
@@ -45,9 +52,9 @@ async function getCustomers(req, res) {
 				withdrawpromo_total,
 				withdraw_total,
 				total,
-				promotion_total
-			}
-		})
+				promotion_total,
+			};
+		});
 
 		const customers = await Promise.all(promises);
 
@@ -74,7 +81,7 @@ async function createCustomer(req, res) {
 		bank,
 		bank_account_id,
 		remark,
-		referent
+		reference,
 	} = data;
 	console.log('[POST] /api/v1/customer ', JSON.stringify(req.body));
 
@@ -94,7 +101,7 @@ async function createCustomer(req, res) {
 						bank,
 						bank_account_id,
 						remark,
-						referent
+						reference,
 					}),
 				);
 				res.json({
