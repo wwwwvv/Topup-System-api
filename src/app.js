@@ -20,7 +20,7 @@ mongoClient
 				origin: '*',
 			}),
 		);
-		app.get('/healthcheck', (req, res) => {
+		app.get('/backend/healthcheck', (req, res) => {
 			res.send('ok');
 		});
 		app.use(verifyToken);
