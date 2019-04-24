@@ -24,9 +24,9 @@ mongoClient
 			res.send('ok');
 		});
 		app.use(verifyToken);
-		app.use('/api/v1/customers', customers);
-		app.use('/api/v1/statements', statements);
-		app.use('/api/v1/users', users);
+		app.use('/backend/api/v1/customers', customers);
+		app.use('/backend/api/v1/statements', statements);
+		app.use('/backend/api/v1/users', users);
 
 		console.log(`Api start at ${config.port}`);
 		app.listen(config.port);

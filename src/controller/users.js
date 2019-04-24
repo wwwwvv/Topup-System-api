@@ -97,7 +97,8 @@ async function login(req, res) {
 }
 
 async function verifyToken(req, res, next) {
-	if (req.path.includes('login')) {
+	console.log('request path: ', req.path);
+	if (req.path.includes('login') || req.path.includes('healthcheck')) {
 		next();
 	} else {
 		try {
