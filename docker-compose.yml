@@ -15,12 +15,13 @@ services:
     build: ./docker/node
     container_name: 'topup-api'
     environment:
+      - 'NODE_ENV=product'
       - 'mongouri=mongodb://database:27017'
     working_dir: /app
     volumes:
       - ./:/app
     command: >
-      sh -c "yarn && yarn start"
+      sh -c "yarn && yarn production"
     logging:
       driver: 'json-file'
     networks:
