@@ -48,7 +48,7 @@ async function cancelStatementById(req, res) {
 
 	const { staffId, statement_id, remark } = data;
 
-	if (!statement_id || !staffId || !remark) {
+	if (!statement_id || !staffId) {
 		res.status(400).send(' 400 Bad request');
 	} else {
 		const result = await statementModel.cancelStatement(staffId, statement_id);
@@ -79,7 +79,7 @@ async function approveStatement(req, res) {
 	const { data } = req.body;
 	const { staffId, statement_id, remark } = data;
 	console.log('[PUT] api/v1/statements ', data);
-	if (!statement_id || !staffId || !remark) {
+	if (!statement_id || !staffId) {
 		res.status(400).send(' 400 Bad request');
 	} else {
 		try {
