@@ -16,7 +16,7 @@ services:
     container_name: 'topup-api'
     environment:
       - 'NODE_ENV=product'
-      - 'mongouri=mongodb://database:2019'
+      - 'mongouri=mongodb://database:2020'
     working_dir: /app
     volumes:
       - ./:/app
