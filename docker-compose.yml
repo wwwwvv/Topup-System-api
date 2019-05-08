@@ -16,7 +16,7 @@ services:
     container_name: 'topup-api'
     environment:
       - 'NODE_ENV=product'
-      - 'mongouri=mongodb://database:27017'
+      - 'mongouri=mongodb://dbza:waveza555@database:27017'
     working_dir: /app
     volumes:
       - ./:/app
