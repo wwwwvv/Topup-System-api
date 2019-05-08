@@ -10,7 +10,7 @@ services:
     networks:
       api:
     ports:
-      - '2019:27017'
+      - '2020:27017'
   server:
     build: ./docker/node
     container_name: 'topup-api'
