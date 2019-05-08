@@ -10,13 +10,13 @@ services:
     networks:
       api:
     ports:
-      - '2020:27017'
+      - '5525:27017'
   server:
     build: ./docker/node
     container_name: 'topup-api'
     environment:
       - 'NODE_ENV=product'
-      - 'mongouri=mongodb://database:2020'
+      - 'mongouri=mongodb://database:5525'
     working_dir: /app
     volumes:
       - ./:/app
