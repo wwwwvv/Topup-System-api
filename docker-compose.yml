@@ -10,13 +10,13 @@ services:
     networks:
       api:
     ports:
-      - '27017:27017'
+      - '2019:27017'
   server:
     build: ./docker/node
     container_name: 'topup-api'
     environment:
       - 'NODE_ENV=product'
-      - 'mongouri=mongodb://dbza:waveza555@database:27017'
+      - 'mongouri=mongodb://database:2019'
     working_dir: /app
     volumes:
       - ./:/app
