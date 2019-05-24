@@ -71,18 +71,18 @@ class Statements extends Model {
 			);
 			if (statementObj.type === 'withdraw') {
 				console.log('Withdrawn operation');
-				if (statementObj.value > total) {
-					console.log('Cant add statement because balance not enough');
-					return false;
-				} else {
-					console.log('Add statement');
-					await this.create({
-						customer_id: ObjectId(customer_id),
-						status: 'waiting',
-						...statementObj,
-					});
-					return true;
-				}
+				// if (statementObj.value > total) {
+				// 	console.log('Cant add statement because balance not enough');
+				// 	return false;
+				// } else {
+				console.log('Add statement');
+				await this.create({
+					customer_id: ObjectId(customer_id),
+					status: 'waiting',
+					...statementObj,
+				});
+				return true;
+				// }
 			} else if (statementObj.type === 'withdraw_promotion') {
 				console.log('withdraw_promotion operation');
 
