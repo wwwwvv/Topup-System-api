@@ -18,6 +18,6 @@
 		"production": "pm2-runtime src/app.js"
 	},
 	"devDependencies": {
-		"eslint-config-google": "^0.12.0"
+		"eslint-config-google": "^0.14.0"
 	}
 }
